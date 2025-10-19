@@ -90,8 +90,6 @@ A secondary labeled dataset in CSV format is used for disease classification (He
 The first step is to load images directly from your Google Drive and create training, validation, and test datasets.  
 TensorFlow’s `image_dataset_from_directory()` utility automatically infers class labels from sub-folder names.
 
----
-
 ### Load and Split the Dataset
 ```python
 import tensorflow as tf
@@ -116,3 +114,120 @@ ds_validation = tf.keras.preprocessing.image_dataset_from_directory(
     seed=123
 )
 ```
+
+Output Example:
+
+```pgsql
+Found 10534 files belonging to 11 classes.
+Using 8428 files for training.
+Using 2106 files for validation.
+```
+
+Why Split the Data?
+
+Splitting prevents overfitting and helps assess the model’s generalization ability on unseen data.
+
+Training set → Used to optimize weights
+
+Validation set → Used to tune hyperparameters
+
+Test set → Used for final evaluation
+
+### Batch Size and Class Labels
+```python
+batch_size = 64
+class_names = dataset.class_names
+print("Classes:", class_names)
+```
+
+Output Example:
+```python
+['ArecaNut', 'Avocado tree', 'Banana palm', 'Bird of Paradise',
+ 'Cast Iron Plant', 'Citrus tree', 'Coconut palm', 'Date palm',
+ 'Ginger', 'Orchid', 'Palm oil']
+```
+
+Further Split for Testing
+```python
+val_batches = tf.data.experimental.cardinality(ds_validation)
+test_dataset = ds_validation.take(val_batches // 5)
+validation_dataset = ds_validation.skip(val_batches // 5)
+```
+
+This keeps 20% of the validation set for testing.
+
+test_dataset → Used for final accuracy evaluation
+
+validation_dataset → Used during model training
+
+Resize Images for Uniformity
+
+All images are resized to 512×512 pixels for consistent tensor dimensions.
+
+```python
+size = (512, 512)
+
+ds_train = ds_train.map(lambda image, label: (tf.image.resize(image, size), label))
+ds_val = validation_dataset.map(lambda image, label: (tf.image.resize(image, size), label))
+ds_test = test_dataset.map(lambda image, label: (tf.image.resize(image, size), label))
+```
+
+This resizing step ensures all models (CNN, ResNet, etc.) receive uniformly shaped input data.
+
+### Visualize Sample Images
+
+Display a few samples from the dataset to verify correct loading and labeling.
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.figure(figsize=(10, 10))
+for images, labels in ds_train.take(1):
+    for i in range(9):
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(images[i].numpy().astype("uint8"))
+        plt.title(class_names[labels[i]])
+        plt.axis("off")
+plt.show()
+```
+
+Example Output:
+A 3×3 grid of correctly labeled plant leaf images confirming dataset integrity.
+
+### Data Augmentation
+
+To prevent overfitting and improve robustness, random transformations are applied to training images.
+```python
+from tensorflow.keras.models import Sequential
+from tensorflow.keras import layers
+
+image_augmentation = Sequential([
+    layers.RandomFlip("horizontal"),
+    layers.RandomRotation(0.1),
+    layers.RandomZoom(height_factor=(-0.2, -0.3),
+                      width_factor=(-0.2, -0.3),
+                      interpolation='bilinear'),
+    layers.RandomContrast(0.1),
+    layers.RandomTranslation(height_factor=0.1, width_factor=0.1),
+], name="image")
+```
+
+Data Augmentation artificially increases dataset diversity without additional image collection.
+
+### Visualize Augmented Images
+```python
+import numpy as np
+plt.figure(figsize=(10, 10))
+
+for images, labels in ds_train.take(1):
+    first_image = images[0]
+    for i in range(9):
+        augmented_image = image_augmentation(tf.expand_dims(first_image, 0), training=True)
+        ax = plt.subplot(3, 3, i + 1)
+        plt.imshow(augmented_image[0].numpy().astype("uint8"))
+        plt.axis("off")
+plt.show()
+```
+
+The model now sees rotated, flipped, zoomed, and translated versions of the same leaf image,
+helping it generalize better to field conditions and variable lighting.
