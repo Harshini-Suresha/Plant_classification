@@ -132,6 +132,7 @@ Training set → Used to optimize weights
 Validation set → Used to tune hyperparameters
 
 Test set → Used for final evaluation
+---
 
 ### 2. Batch Size and Class Labels
 ```python
@@ -146,6 +147,7 @@ Output Example:
  'Cast Iron Plant', 'Citrus tree', 'Coconut palm', 'Date palm',
  'Ginger', 'Orchid', 'Palm oil']
 ```
+---
 
 ### 3. Further Split for Testing
 ```python
@@ -218,6 +220,8 @@ image_augmentation = Sequential([
 
 Data Augmentation artificially increases dataset diversity without additional image collection.
 
+---
+
 ### 6. Visualize Augmented Images
 ```python
 import numpy as np
@@ -236,6 +240,7 @@ plt.show()
 The model now sees rotated, flipped, zoomed, and translated versions of the same leaf image,
 helping it generalize better to field conditions and variable lighting.
 
+---
 
 ## Part 3: Model Building and Compilation
 
@@ -282,7 +287,9 @@ Final layer uses Softmax for multi-class probability prediction.
 
 Augmentation + Rescaling ensures better generalization.
 
-### 3. Model Compilation  
+---
+
+### 2. Model Compilation  
 We use Adam optimizer and categorical crossentropy loss for multi-class classification.
 ```python
 model_cnn.compile(
@@ -311,8 +318,9 @@ callbacks = [
     ModelCheckpoint(filepath='best_cnn_model.h5', save_best_only=True)
 ]
 ```
+---
 
-### 4. Train the Model
+### 3. Train the Model
 ```python
 history_cnn = model_cnn.fit(
     ds_train,
@@ -329,8 +337,9 @@ Typical Output Example:
 Epoch 10/30
 132/132 [==============================] - 70s 530ms/step - loss: 0.441 - accuracy: 0.889 - val_loss: 0.512 - val_accuracy: 0.872
 ```
+---
 
-### 5. Visualize Training Curves
+### 4. Visualize Training Curves
 ```python
 import matplotlib.pyplot as plt
 
@@ -367,6 +376,8 @@ model_cnn.save("/content/gdrive/MyDrive/Plant_CNN_Model.h5")
 
 The saved model can later be reloaded for testing, visualization, or integration with YOLO-based disease detection.
 
+---
+
 ## Part 4: ResNet50 Transfer Learning and Ensemble Modeling
 
 To improve feature extraction and overall accuracy, this project incorporates **transfer learning** using a pretrained **ResNet50** model.  
@@ -393,7 +404,6 @@ resnet_base = ResNet50(
 resnet_base.trainable = False
 ```
 ---
-
 
 ### 2. Add Custom Classification Head
 
@@ -514,7 +524,6 @@ Both the CNN and ResNet50 models can be exported and used for inference or integ
 After training and fine-tuning the CNN and ResNet50 models, the next step is to evaluate their performance on the **unseen test dataset**.  
 This section measures quantitative metrics (Accuracy, Precision, Recall, F1-Score, Cohen’s Kappa) and provides visualization tools to interpret results.
 
----
 
 ### 1️. Evaluate Model Performance on Test Set
 ```python
@@ -548,6 +557,8 @@ print("Cohen’s Kappa:", cohen_kappa_score(y_true, y_pred))
 
 Cohen’s Kappa accounts for chance agreement, providing a more reliable measure than raw accuracy—especially for imbalanced datasets.
 
+---
+
 ### 3. Classification Report
 ```python
 report = classification_report(y_true, y_pred, target_names=class_names)
@@ -564,6 +575,8 @@ Palm Oil            0.96       0.94      0.95       190
 accuracy                                0.93      2106
 macro avg           0.93       0.92      0.93      2106
 weighted avg        0.93       0.93      0.93      2106
+
+---
 
 ### 4. Confusion Matrix Visualization
 ```python
@@ -584,6 +597,8 @@ plt.show()
 
 The confusion matrix highlights class-wise prediction performance, showing which species are most commonly confused.
 
+---
+
 ### 5. Plot Accuracy & Loss Curves
 ```python
 plt.figure(figsize=(10, 5))
@@ -602,6 +617,7 @@ plt.show()
 ```
 
 These curves provide a visual check for convergence and overfitting trends.
+
 ---
 
 ### 6. Model Interpretability (Grad-CAM Visualization)
