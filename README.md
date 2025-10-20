@@ -90,7 +90,7 @@ A secondary labeled dataset in CSV format is used for disease classification (He
 The first step is to load images directly from your Google Drive and create training, validation, and test datasets.  
 TensorFlow’s `image_dataset_from_directory()` utility automatically infers class labels from sub-folder names.
 
-### Load and Split the Dataset
+### 1. Load and Split the Dataset
 ```python
 import tensorflow as tf
 
@@ -133,7 +133,7 @@ Validation set → Used to tune hyperparameters
 
 Test set → Used for final evaluation
 
-### Batch Size and Class Labels
+### 2. Batch Size and Class Labels
 ```python
 batch_size = 64
 class_names = dataset.class_names
@@ -147,7 +147,7 @@ Output Example:
  'Ginger', 'Orchid', 'Palm oil']
 ```
 
-Further Split for Testing
+### 3. Further Split for Testing
 ```python
 val_batches = tf.data.experimental.cardinality(ds_validation)
 test_dataset = ds_validation.take(val_batches // 5)
@@ -173,9 +173,10 @@ ds_test = test_dataset.map(lambda image, label: (tf.image.resize(image, size), l
 ```
 
 This resizing step ensures all models (CNN, ResNet, etc.) receive uniformly shaped input data.
+
 ---
 
-### Visualize Sample Images
+### 4. Visualize Sample Images
 
 Display a few samples from the dataset to verify correct loading and labeling.
 ```python
@@ -194,9 +195,10 @@ plt.show()
 
 Example Output:
 A 3×3 grid of correctly labeled plant leaf images confirming dataset integrity.
+
 ---
 
-### Data Augmentation
+### 5. Data Augmentation
 
 To prevent overfitting and improve robustness, random transformations are applied to training images.
 ```python
@@ -216,7 +218,7 @@ image_augmentation = Sequential([
 
 Data Augmentation artificially increases dataset diversity without additional image collection.
 
-### Visualize Augmented Images
+### 6. Visualize Augmented Images
 ```python
 import numpy as np
 plt.figure(figsize=(10, 10))
@@ -242,7 +244,7 @@ Both models use TensorFlow’s Keras API, with layers optimized for image featur
 
 ---
 
-### Convolutional Neural Network (CNN)
+### 1. Convolutional Neural Network (CNN)
 
 This is a simple, efficient baseline architecture for image classification.  
 It includes convolutional, pooling, dropout, and dense layers.
@@ -280,7 +282,8 @@ Final layer uses Softmax for multi-class probability prediction.
 
 Augmentation + Rescaling ensures better generalization.
 
-Model Compilation - We use Adam optimizer and categorical crossentropy loss for multi-class classification.
+### 3. Model Compilation  
+We use Adam optimizer and categorical crossentropy loss for multi-class classification.
 ```python
 model_cnn.compile(
     optimizer='adam',
@@ -309,7 +312,7 @@ callbacks = [
 ]
 ```
 
-Train the Model
+### 4. Train the Model
 ```python
 history_cnn = model_cnn.fit(
     ds_train,
@@ -327,7 +330,7 @@ Epoch 10/30
 132/132 [==============================] - 70s 530ms/step - loss: 0.441 - accuracy: 0.889 - val_loss: 0.512 - val_accuracy: 0.872
 ```
 
-Visualize Training Curves
+### 5. Visualize Training Curves
 ```python
 import matplotlib.pyplot as plt
 
@@ -513,7 +516,7 @@ This section measures quantitative metrics (Accuracy, Precision, Recall, F1-Scor
 
 ---
 
-### 1️.. Evaluate Model Performance on Test Set
+### 1️. Evaluate Model Performance on Test Set
 ```python
 from sklearn.metrics import classification_report, confusion_matrix
 import numpy as np
