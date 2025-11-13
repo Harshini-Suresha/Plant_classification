@@ -1,3 +1,4 @@
+# TriggerNet — Red Palm Mite Detection Framework
 # Deep Learning-Based Classification of Plants and Detection of Red Palm Mite Infestation from Leaf Images
 
 This repository implements the research work titled  **“Deep Learning-Based Classification of Plants and Detection of Red Palm Mite Infestation from Leaf Images.”**  
